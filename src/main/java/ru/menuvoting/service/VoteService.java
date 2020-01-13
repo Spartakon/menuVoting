@@ -40,7 +40,7 @@ public class VoteService {
         Assert.notNull(vote, "vote must not be null");
 
         LocalDateTime currentDateTime = dateTimeBean.getDATE_TIME_CURRENT();
-        checkFinishingVoting(currentDateTime.toLocalTime());
+        checkTimeToUpdateVote(currentDateTime.toLocalTime());
         checkDateVoting(vote.getDate(), currentDateTime);
         checkNotFoundWithId(voteRepository.save(vote, userId, restaurantId, currentDateTime.toLocalDate()), vote.getId());
     }
@@ -50,7 +50,6 @@ public class VoteService {
         Assert.notNull(vote, "vote must not be null");
 
         LocalDateTime currentDateTime = dateTimeBean.getDATE_TIME_CURRENT();
-        checkFinishingVoting(currentDateTime.toLocalTime());
 
         Menu menu = menuRepository.getByDate(restaurantId, currentDateTime.toLocalDate());
         checkNotFound(menu, "Menu to date=" + currentDateTime.toLocalDate().toString());

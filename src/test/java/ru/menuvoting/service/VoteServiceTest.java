@@ -31,7 +31,6 @@ public class VoteServiceTest extends AbstractServiceTest {
 
     @Test
     void create() throws Exception {
-        dateTimeBean.setIsTest(KEY_FOR_TEST_BEFORE);
         Vote newVote = getNew();
         Vote created = service.create(newVote, USER2.getId(), RESTAURANT2_ID);
         Integer newId = created.getId();
@@ -42,23 +41,13 @@ public class VoteServiceTest extends AbstractServiceTest {
 
     @Test
     void createAgainToDayError() throws Exception {
-        dateTimeBean.setIsTest(KEY_FOR_TEST_BEFORE);
         Vote newVote = getNew();
         assertThrows(DataIntegrityViolationException.class, () ->
                 service.create(newVote, USER_ID, RESTAURANT2_ID));
     }
 
     @Test
-    void createAfterFinishVotingError() throws Exception {
-        dateTimeBean.setIsTest(KEY_FOR_TEST_AFTER);
-        Vote newVote = getNew();
-        assertThrows(TimeVotingException.class, () ->
-                service.create(newVote, USER2.getId(), RESTAURANT2_ID));
-    }
-
-    @Test
     void createWithNotMenuToDayError() throws Exception {
-        dateTimeBean.setIsTest(KEY_FOR_TEST_BEFORE);
         Vote newVote = getNew();
         assertThrows(NotFoundException.class, () ->
                 service.create(newVote, USER2.getId(), RESTAURANT3_ID));

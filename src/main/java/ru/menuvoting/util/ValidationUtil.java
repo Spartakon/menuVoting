@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-import static ru.menuvoting.util.DateTimeUtil.TIME_FINISHING_VOTING;
+import static ru.menuvoting.util.DateTimeUtil.TIME_FINISHING_UPDATE_VOTE;
 
 public class ValidationUtil {
 
@@ -60,9 +60,9 @@ public class ValidationUtil {
         }
     }
 
-    public static void checkFinishingVoting(LocalTime time) {
-        if (time.isAfter(TIME_FINISHING_VOTING)) {
-            throw new TimeVotingException("Voting has already finished");
+    public static void checkTimeToUpdateVote(LocalTime time) {
+        if (time.isAfter(TIME_FINISHING_UPDATE_VOTE)) {
+            throw new TimeVotingException("Don't change your vote after " + TIME_FINISHING_UPDATE_VOTE.toString());
         }
     }
 

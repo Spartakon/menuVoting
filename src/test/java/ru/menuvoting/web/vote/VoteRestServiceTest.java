@@ -23,8 +23,7 @@ import static ru.menuvoting.UserTestData.USER;
 import static ru.menuvoting.UserTestData.USER2;
 import static ru.menuvoting.UserTestData.USER_ID;
 import static ru.menuvoting.VoteTestData.*;
-import static ru.menuvoting.util.DateTimeUtil.KEY_FOR_TEST_AFTER;
-import static ru.menuvoting.util.DateTimeUtil.KEY_FOR_TEST_BEFORE;
+import static ru.menuvoting.util.DateTimeUtil.*;
 import static ru.menuvoting.util.exception.ErrorType.VALIDATION_ERROR;
 import static ru.menuvoting.web.ExceptionInfoHandler.EXCEPTION_DUPLICATE_VOTE;
 
@@ -99,7 +98,9 @@ class VoteRestServiceTest extends AbstractControllerTest {
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.type").value(VALIDATION_ERROR.name()))
-                .andExpect(jsonPath("$.details").value("ru.menuvoting.util.exception.TimeVotingException: Voting has already finished"));
+                .andExpect(jsonPath("$.details").value(
+                        "ru.menuvoting.util.exception.TimeVotingException:" +
+                                " Don't change your vote after " + TIME_FINISHING_UPDATE_VOTE.toString()));
     }
 
     @Test
@@ -119,7 +120,6 @@ class VoteRestServiceTest extends AbstractControllerTest {
 
     @Test
     void createWithLocation() throws Exception {
-        dateTimeBean.setIsTest(KEY_FOR_TEST_BEFORE);
         Vote newVote = VoteTestData.getNew();
         ResultActions action = mockMvc.perform(MockMvcRequestBuilders.post(REST_URL)
                 .param("restaurantId", String.valueOf(RESTAURANT2_ID))
@@ -138,7 +138,6 @@ class VoteRestServiceTest extends AbstractControllerTest {
     @Test
     @Transactional(propagation = Propagation.NEVER)
     void createAgainToDayError() throws Exception {
-        dateTimeBean.setIsTest(KEY_FOR_TEST_BEFORE);
         Vote newVote = VoteTestData.getNew();
         mockMvc.perform(MockMvcRequestBuilders.post(REST_URL)
                 .param("restaurantId", String.valueOf(RESTAURANT2_ID))
@@ -149,22 +148,6 @@ class VoteRestServiceTest extends AbstractControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.type").value(VALIDATION_ERROR.name()))
                 .andExpect(jsonPath("$.details").value(EXCEPTION_DUPLICATE_VOTE));
-    }
-
-    @Test
-    @Transactional(propagation = Propagation.NEVER)
-    void createAfterFinishVotingError() throws Exception {
-        dateTimeBean.setIsTest(KEY_FOR_TEST_AFTER);
-        Vote newVote = VoteTestData.getNew();
-        mockMvc.perform(MockMvcRequestBuilders.post(REST_URL)
-                .param("restaurantId", String.valueOf(RESTAURANT2_ID))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.writeValue(newVote))
-                .with(userHttpBasic(USER)))
-                .andDo(print())
-                .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.type").value(VALIDATION_ERROR.name()))
-                .andExpect(jsonPath("$.details").value("ru.menuvoting.util.exception.TimeVotingException: Voting has already finished"));
     }
 
     @Test

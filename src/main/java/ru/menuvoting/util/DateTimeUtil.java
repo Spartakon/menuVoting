@@ -8,7 +8,7 @@ import java.time.LocalTime;
 
 public class DateTimeUtil {
     public static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm";
-    public static final LocalTime TIME_FINISHING_VOTING = LocalTime.of(11, 00);
+    public static final LocalTime TIME_FINISHING_UPDATE_VOTE = LocalTime.of(11, 00);
     public static final LocalDateTime DATE_TIME_FOR_TEST_BEFORE = LocalDateTime.now().withHour(10).withMinute(15);
     public static final LocalDateTime DATE_TIME_FOR_TEST_AFTER = LocalDateTime.now().withHour(11).withMinute(00);
 
