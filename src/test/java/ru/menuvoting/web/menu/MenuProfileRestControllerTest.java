@@ -29,7 +29,7 @@ public class MenuProfileRestControllerTest extends AbstractControllerTest {
 
     @Test
     void getForVoting() throws Exception {
-        List<Menu> menu = menuService.getForVoting();
+        List<Menu> menu = menuService.getAllTodayWithRestaurantAndDishes();
         menu.get(0).setRestaurant(RESTAURANT1);
         menu.get(1).setRestaurant(RESTAURANT2);
 

@@ -47,7 +47,7 @@ public class MenuRepository {
         return crudMenuRepository.getByDate(restaurantId, date);
     }
 
-    public List<Menu> getForVoting(LocalDate date) {
-        return crudMenuRepository.getForVoting(date);
+    public List<Menu> getAllByDateWithRestaurantAndDishes(LocalDate date) {
+        return crudMenuRepository.getAllByDateWithRestaurantAndDishes(date);
     }
 }

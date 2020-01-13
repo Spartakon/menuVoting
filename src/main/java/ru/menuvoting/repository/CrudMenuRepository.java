@@ -32,7 +32,7 @@ public interface CrudMenuRepository extends JpaRepository<Menu, Integer> {
 
     @EntityGraph(attributePaths = {"dishes"}, type = EntityGraph.EntityGraphType.FETCH)
     @Query("SELECT m FROM Menu m JOIN FETCH m.restaurant JOIN FETCH m.dishes WHERE m.date=:date ORDER BY m.restaurant.name")
-    List<Menu> getForVoting(@Param("date") LocalDate date);
+    List<Menu> getAllByDateWithRestaurantAndDishes(@Param("date") LocalDate date);
 
     @Query("SELECT m FROM Menu m WHERE m.restaurant.id=:restaurantId AND m.date=:date")
     Menu getByDate(@Param("restaurantId") int restaurantId, @Param("date") LocalDate date);

@@ -52,8 +52,8 @@ public abstract class AbstractMenuController {
         return service.getByDate(restaurantId, date);
     }
 
-    public List<MenuTo> getForVoting() {
+    public List<MenuTo> getAllTodayWithRestaurantAndDishes() {
         log.info("get all for voting");
-        return MenusUtil.getTos(service.getForVoting());
+        return MenusUtil.getTos(service.getAllTodayWithRestaurantAndDishes());
     }
 }

@@ -15,7 +15,7 @@ public class MenuProfileRestController extends AbstractMenuController {
 
     @Override
     @GetMapping
-    public List<MenuTo> getForVoting() {
-        return super.getForVoting();
+    public List<MenuTo> getAllTodayWithRestaurantAndDishes() {
+        return super.getAllTodayWithRestaurantAndDishes();
     }
 }

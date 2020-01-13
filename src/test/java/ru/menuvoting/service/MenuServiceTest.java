@@ -107,7 +107,7 @@ public class MenuServiceTest extends AbstractServiceTest {
 
     @Test
     void getForVoting() throws Exception {
-        MENU_MATCHERS.assertMatch(service.getForVoting(), MENU1, MENU2);
+        MENU_MATCHERS.assertMatch(service.getAllTodayWithRestaurantAndDishes(), MENU1, MENU2);
     }
 
     @Test

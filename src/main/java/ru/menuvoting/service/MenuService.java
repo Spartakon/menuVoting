@@ -43,8 +43,8 @@ public class MenuService {
         return repository.save(menu, restaurantId);
     }
 
-    public List<Menu> getForVoting() {
-        return repository.getForVoting(LocalDate.now());
+    public List<Menu> getAllTodayWithRestaurantAndDishes() {
+        return repository.getAllByDateWithRestaurantAndDishes(LocalDate.now());
     }
 
     public Menu getByDate(int restaurantId, LocalDate date) {

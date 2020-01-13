@@ -7,23 +7,23 @@ import java.util.Objects;
 
 public class MenuTo extends BaseTo {
 
-    private final String name;
+    private final String restaurantName;
 
     private final LocalDate date;
 
     private final List<DishTo> dishes;
 
     // id and name for restaurant
-    @ConstructorProperties({"id", "name", "date", "dishes"})
-    public MenuTo(Integer id, String name, LocalDate date, List<DishTo> dishes) {
+    @ConstructorProperties({"id", "restaurantName", "date", "dishes"})
+    public MenuTo(Integer id, String restaurantName, LocalDate date, List<DishTo> dishes) {
         super(id);
-        this.name = name;
+        this.restaurantName = restaurantName;
         this.date = date;
         this.dishes = dishes;
     }
 
-    public String getName() {
-        return name;
+    public String getRestaurantName() {
+        return restaurantName;
     }
 
     public LocalDate getDate() {
@@ -40,21 +40,21 @@ public class MenuTo extends BaseTo {
         if (o == null || getClass() != o.getClass()) return false;
         MenuTo that = (MenuTo) o;
         return Objects.equals(id, that.id) &&
-                Objects.equals(name, that.name) &&
+                Objects.equals(restaurantName, that.restaurantName) &&
                 Objects.equals(date, that.date) &&
                 Objects.equals(dishes, that.dishes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, date, dishes);
+        return Objects.hash(id, restaurantName, date, dishes);
     }
 
     @Override
     public String toString() {
         return "MenuTo{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
+                ", name='" + restaurantName + '\'' +
                 ", date=" + date +
                 ", dishes=" + dishes +
                 '}';
