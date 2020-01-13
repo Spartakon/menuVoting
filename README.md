@@ -41,12 +41,12 @@ Get yourself: `curl -s http://localhost:8080/menuvoting/rest/profile  --user use
 Update yourself: `curl -s -X PUT -d '{"name":"New777","email":"user@yandex.ru","password":"passwordNew"}' -H 'Content-Type: application/json' http://localhost:8080/menuvoting/rest/profile --user user@yandex.ru:password`  
 Delete yourself: `curl -s -X DELETE http://localhost:8080/menuvoting/rest/profile --user user@yandex.ru:password`
 #### Restaurant
-Get all: `curl -s http://localhost:8080/menuvoting/rest/profile/restaurants --user user@yandex.ru:password`     
-Get id=100003: `curl -s http://localhost:8080/menuvoting/rest/profile/restaurants/100003  --user user@yandex.ru:password`   
-Get by name "Ресторан 1": `curl -s http://localhost:8080/menuvoting/rest/profile/restaurants/by?name=%D0%A0%D0%B5%D1%81%D1%82%D0%BE%D1%80%D0%B0%D0%BD%201  --user user@yandex.ru:password`   
-Get all with votes: `curl -s http://localhost:8080/menuvoting/rest/profile/restaurants/result --user user@yandex.ru:password`
+Get all: `curl -s http://localhost:8080/menuvoting/rest/restaurants --user user@yandex.ru:password`     
+Get id=100003: `curl -s http://localhost:8080/menuvoting/rest/restaurants/100003  --user user@yandex.ru:password`   
+Get by name "Ресторан 1": `curl -s http://localhost:8080/menuvoting/rest/restaurants/by?name=%D0%A0%D0%B5%D1%81%D1%82%D0%BE%D1%80%D0%B0%D0%BD%201 --user user@yandex.ru:password`   
+Get all with votes: `curl -s http://localhost:8080/menuvoting/rest/restaurants/result --user user@yandex.ru:password`
 #### Menu
-Get menus for voting: `curl -s http://localhost:8080/menuvoting/rest/profile/menus --user user@yandex.ru:password`
+Get menus for voting: `curl -s http://localhost:8080/menuvoting/rest/menus --user user@yandex.ru:password`
 #### Vote
 Get all: `curl -s http://localhost:8080/menuvoting/rest/profile/votes --user user@yandex.ru:password`     
 Create vote for restaurant id=100004: `curl -s -X POST -d '{}' -H 'Content-Type:application/json;charset=UTF-8' http://localhost:8080/menuvoting/rest/profile/votes?restaurantId=100004  --user user2@gmail.com:password2`      
