@@ -17,7 +17,7 @@ Build a voting system for deciding where to have lunch.
 Each restaurant provides new menu each day.
 
 ## Запуск
-Для запуска приложения необходимо ввести в консоли 
+Для запуска приложения необходимо ввести в консоли: 
 ```html
 mvn clean package -DskipTests=true org.codehaus.cargo:cargo-maven2-plugin:1.7.7:run
 ```
@@ -49,9 +49,9 @@ Get all with votes: `curl -s http://localhost:8080/menuvoting/rest/restaurants/r
 Get menus for voting: `curl -s http://localhost:8080/menuvoting/rest/menus --user user@yandex.ru:password`
 #### Vote
 Get all: `curl -s http://localhost:8080/menuvoting/rest/profile/votes --user user@yandex.ru:password`     
-Create vote for restaurant id=100004: `curl -s -X POST -d '{}' -H 'Content-Type:application/json;charset=UTF-8' http://localhost:8080/menuvoting/rest/profile/votes?restaurantId=100004  --user user2@gmail.com:password2`      
+Create vote for restaurant id=100004: `curl -s -X POST -H 'Content-Type:application/json;charset=UTF-8' http://localhost:8080/menuvoting/rest/profile/votes?restaurantId=100004  --user user2@gmail.com:password2`      
 Get id=100016: `curl -s http://localhost:8080/menuvoting/rest/profile/votes/100016  --user user@yandex.ru:password`   
-Update id=100016: `curl -s -X PUT -d '{}' -H 'Content-Type: application/json' http://localhost:8080/menuvoting/rest/profile/votes/100016?restaurantId=100004 --user user@yandex.ru:password`
+Update id=100016: `curl -s -X PUT -H 'Content-Type: application/json' http://localhost:8080/menuvoting/rest/profile/votes/100016?restaurantId=100004 --user user@yandex.ru:password`
 ### Пользователь с ролью "Admin"
 #### User
 Get all: `curl -s http://localhost:8080/menuvoting/rest/admin/users --user admin@gmail.com:admin`     

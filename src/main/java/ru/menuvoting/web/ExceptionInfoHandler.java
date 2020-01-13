@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.Optional;
 
+import static ru.menuvoting.util.DateTimeUtil.TIME_FINISHING_UPDATE_VOTE;
 import static ru.menuvoting.util.exception.ErrorType.*;
 
 @RestControllerAdvice(annotations = RestController.class)
@@ -34,7 +35,8 @@ public class ExceptionInfoHandler {
     public static final String EXCEPTION_DUPLICATE_RESTAURANT_NAME = "Restaurant with this name already exists";
     public static final String EXCEPTION_DUPLICATE_DATE = "Menu with this date already exists";
     public static final String EXCEPTION_DUPLICATE_DISH_NAME = "Dish with this name already exists";
-    public static final String EXCEPTION_DUPLICATE_VOTE = "You already voted today, you can change your vote until 11:00";
+    public static final String EXCEPTION_DUPLICATE_VOTE = "You already voted today, you can change your vote until " +
+                                                            TIME_FINISHING_UPDATE_VOTE.toString();
 
     private static final Map<String, String> CONSTRAINS_VALIDATION_MAP = Map.of(
             "users_unique_email_idx", EXCEPTION_DUPLICATE_EMAIL,

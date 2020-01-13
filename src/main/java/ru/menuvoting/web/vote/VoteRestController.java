@@ -15,9 +15,6 @@ import ru.menuvoting.web.SecurityUtil;
 import java.net.URI;
 import java.util.List;
 
-import static ru.menuvoting.util.ValidationUtil.assureIdConsistent;
-import static ru.menuvoting.util.ValidationUtil.checkNew;
-
 @RestController
 @RequestMapping(value = VoteRestController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 public class VoteRestController {
@@ -44,19 +41,17 @@ public class VoteRestController {
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void update(@RequestBody Vote vote, @PathVariable int id, @RequestParam int restaurantId) {
+    public void update(@PathVariable int id, @RequestParam int restaurantId) {
         int userId = SecurityUtil.authUserId();
-        assureIdConsistent(vote, id);
-        log.info("update {} for user {}", vote, userId);
-        voteService.update(vote, userId, restaurantId);
+        log.info("update vote for user {}", userId);
+        voteService.update(id, userId, restaurantId);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Vote> createWithLocation(@RequestBody Vote vote, @RequestParam int restaurantId) {
+    public ResponseEntity<Vote> createWithLocation(@RequestParam int restaurantId) {
         int userId = SecurityUtil.authUserId();
-        checkNew(vote);
-        log.info("create {} for user {} with vote for menu {}", vote, userId, restaurantId);
-        Vote created = voteService.create(vote, userId, restaurantId);
+        log.info("create vote for user {} for restaurant {}", userId, restaurantId);
+        Vote created = voteService.create(userId, restaurantId);
 
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(REST_URL + "/{id}")

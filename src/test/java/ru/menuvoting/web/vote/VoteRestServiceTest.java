@@ -7,17 +7,18 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import ru.menuvoting.RestaurantTestData;
 import ru.menuvoting.VoteTestData;
 import ru.menuvoting.datetime.DateTimeBean;
 import ru.menuvoting.model.Vote;
 import ru.menuvoting.service.VoteService;
 import ru.menuvoting.web.AbstractControllerTest;
-import ru.menuvoting.web.json.JsonUtil;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.menuvoting.RestaurantTestData.RESTAURANT1_ID;
 import static ru.menuvoting.RestaurantTestData.RESTAURANT2_ID;
+import static ru.menuvoting.RestaurantTestData.RESTAURANT2;
 import static ru.menuvoting.TestUtil.*;
 import static ru.menuvoting.UserTestData.USER;
 import static ru.menuvoting.UserTestData.USER2;
@@ -71,29 +72,29 @@ class VoteRestServiceTest extends AbstractControllerTest {
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
     void update() throws Exception {
         dateTimeBean.setIsTest(KEY_FOR_TEST_BEFORE);
         Vote updated = VoteTestData.getUpdated();
         mockMvc.perform(MockMvcRequestBuilders.put(REST_URL + VOTE1_ID)
                 .param("restaurantId", String.valueOf(RESTAURANT2_ID))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.writeValue(updated))
                 .with(userHttpBasic(USER)))
                 .andExpect(status().isNoContent())
                 .andDo(print());
 
-        VOTE_MATCHERS.assertMatch(voteService.get(VOTE1_ID, USER_ID), updated);
+        Vote actual = voteService.getWithRestaurant(VOTE1_ID, USER_ID);
+        VOTE_MATCHERS.assertMatch(actual, updated);
+        RestaurantTestData.RESTAURANT_MATCHERS.assertMatch(actual.getRestaurant(), RESTAURANT2);
     }
 
     @Test
     @Transactional(propagation = Propagation.NEVER)
     void updateAfterFinishVotingError() throws Exception {
         dateTimeBean.setIsTest(KEY_FOR_TEST_AFTER);
-        Vote updated = VoteTestData.getUpdated();
         mockMvc.perform(MockMvcRequestBuilders.put(REST_URL + VOTE1_ID)
                 .param("restaurantId", String.valueOf(RESTAURANT2_ID))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.writeValue(updated))
                 .with(userHttpBasic(USER)))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity())
@@ -106,11 +107,9 @@ class VoteRestServiceTest extends AbstractControllerTest {
     @Test
     void updateMenuForLastDateError() throws Exception {
         dateTimeBean.setIsTest(KEY_FOR_TEST_BEFORE);
-        Vote updated = getUpdatedPastDate();
         mockMvc.perform(MockMvcRequestBuilders.put(REST_URL + VOTE4_ID)
                 .param("restaurantId", String.valueOf(RESTAURANT1_ID))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.writeValue(updated))
                 .with(userHttpBasic(USER2)))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity())
@@ -119,12 +118,12 @@ class VoteRestServiceTest extends AbstractControllerTest {
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
     void createWithLocation() throws Exception {
         Vote newVote = VoteTestData.getNew();
         ResultActions action = mockMvc.perform(MockMvcRequestBuilders.post(REST_URL)
                 .param("restaurantId", String.valueOf(RESTAURANT2_ID))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.writeValue(newVote))
                 .with(userHttpBasic(USER2)))
                 .andDo(print());
 
@@ -132,17 +131,18 @@ class VoteRestServiceTest extends AbstractControllerTest {
         Integer newId = created.getId();
         newVote.setId(newId);
         VOTE_MATCHERS.assertMatch(created, newVote);
+
+        Vote actual = voteService.getWithRestaurant(newId, USER2.getId());
         VOTE_MATCHERS.assertMatch(voteService.get(newId, USER2.getId()), newVote);
+        RestaurantTestData.RESTAURANT_MATCHERS.assertMatch(actual.getRestaurant(), RESTAURANT2);
     }
 
     @Test
     @Transactional(propagation = Propagation.NEVER)
     void createAgainToDayError() throws Exception {
-        Vote newVote = VoteTestData.getNew();
         mockMvc.perform(MockMvcRequestBuilders.post(REST_URL)
                 .param("restaurantId", String.valueOf(RESTAURANT2_ID))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonUtil.writeValue(newVote))
                 .with(userHttpBasic(USER)))
                 .andDo(print())
                 .andExpect(status().isConflict())

@@ -32,7 +32,7 @@ public class VoteServiceTest extends AbstractServiceTest {
     @Test
     void create() throws Exception {
         Vote newVote = getNew();
-        Vote created = service.create(newVote, USER2.getId(), RESTAURANT2_ID);
+        Vote created = service.create(USER2.getId(), RESTAURANT2_ID);
         Integer newId = created.getId();
         newVote.setId(newId);
         VOTE_MATCHERS.assertMatch(created, newVote);
@@ -41,16 +41,14 @@ public class VoteServiceTest extends AbstractServiceTest {
 
     @Test
     void createAgainToDayError() throws Exception {
-        Vote newVote = getNew();
         assertThrows(DataIntegrityViolationException.class, () ->
-                service.create(newVote, USER_ID, RESTAURANT2_ID));
+                service.create(USER_ID, RESTAURANT2_ID));
     }
 
     @Test
     void createWithNotMenuToDayError() throws Exception {
-        Vote newVote = getNew();
         assertThrows(NotFoundException.class, () ->
-                service.create(newVote, USER2.getId(), RESTAURANT3_ID));
+                service.create(USER2.getId(), RESTAURANT3_ID));
     }
 
     @Test
@@ -73,7 +71,7 @@ public class VoteServiceTest extends AbstractServiceTest {
     void update() throws Exception {
         dateTimeBean.setIsTest(KEY_FOR_TEST_BEFORE);
         Vote updated = getUpdated();
-        service.update(updated, USER_ID, RESTAURANT2_ID);
+        service.update(updated.getId(), USER_ID, RESTAURANT2_ID);
         VOTE_MATCHERS.assertMatch(service.get(VOTE1_ID, USER_ID), updated);
     }
 
@@ -81,7 +79,7 @@ public class VoteServiceTest extends AbstractServiceTest {
     void updateNotFound() throws Exception {
         dateTimeBean.setIsTest(KEY_FOR_TEST_BEFORE);
         Vote updated = getUpdated();
-        NotFoundException e = assertThrows(NotFoundException.class, () -> service.update(updated, USER2.getId(), RESTAURANT1_ID));
+        NotFoundException e = assertThrows(NotFoundException.class, () -> service.update(updated.getId(), USER2.getId(), RESTAURANT1_ID));
         assertEquals(e.getMessage(), "Not found entity with id=" + VOTE1_ID);
     }
 
@@ -90,7 +88,7 @@ public class VoteServiceTest extends AbstractServiceTest {
         dateTimeBean.setIsTest(KEY_FOR_TEST_AFTER);
         Vote updated = getUpdated();
         assertThrows(TimeVotingException.class, () ->
-                service.update(updated, USER_ID, RESTAURANT2_ID));
+                service.update(updated.getId(), USER_ID, RESTAURANT2_ID));
     }
 
     @Test
@@ -98,7 +96,7 @@ public class VoteServiceTest extends AbstractServiceTest {
         dateTimeBean.setIsTest(KEY_FOR_TEST_BEFORE);
         Vote updated = getUpdatedPastDate();
         assertThrows(TimeVotingException.class, () ->
-                service.update(updated, USER2.getId(), RESTAURANT1_ID));
+                service.update(updated.getId(), USER2.getId(), RESTAURANT1_ID));
     }
 
     @Test

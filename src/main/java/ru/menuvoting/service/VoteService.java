@@ -2,7 +2,6 @@ package ru.menuvoting.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 import ru.menuvoting.datetime.DateTimeBean;
 import ru.menuvoting.model.Menu;
 import ru.menuvoting.model.Vote;
@@ -36,24 +35,21 @@ public class VoteService {
     }
 
     @Transactional
-    public void update(Vote vote, int userId, int restaurantId) {
-        Assert.notNull(vote, "vote must not be null");
-
+    public void update(int id, int userId, int restaurantId) {
         LocalDateTime currentDateTime = dateTimeBean.getDATE_TIME_CURRENT();
         checkTimeToUpdateVote(currentDateTime.toLocalTime());
+
+        Vote vote = get(id, userId);
         checkDateVoting(vote.getDate(), currentDateTime);
         checkNotFoundWithId(voteRepository.save(vote, userId, restaurantId, currentDateTime.toLocalDate()), vote.getId());
     }
 
     @Transactional
-    public Vote create(Vote vote, int userId, int restaurantId) {
-        Assert.notNull(vote, "vote must not be null");
-
+    public Vote create(int userId, int restaurantId) {
         LocalDateTime currentDateTime = dateTimeBean.getDATE_TIME_CURRENT();
-
         Menu menu = menuRepository.getByDate(restaurantId, currentDateTime.toLocalDate());
         checkNotFound(menu, "Menu to date=" + currentDateTime.toLocalDate().toString());
-        return voteRepository.save(vote, userId, restaurantId, currentDateTime.toLocalDate());
+        return voteRepository.save(new Vote(), userId, restaurantId, currentDateTime.toLocalDate());
     }
 
     public Vote getWithRestaurant(int id, int userId) {
