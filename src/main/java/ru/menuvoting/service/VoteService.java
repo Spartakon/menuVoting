@@ -2,7 +2,6 @@ package ru.menuvoting.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.menuvoting.datetime.DateTimeBean;
 import ru.menuvoting.model.Menu;
 import ru.menuvoting.model.Vote;
 import ru.menuvoting.repository.MenuRepository;
@@ -11,6 +10,7 @@ import ru.menuvoting.repository.VoteRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static ru.menuvoting.util.DateTimeUtil.getCurrentDateTime;
 import static ru.menuvoting.util.ValidationUtil.*;
 
 @Service
@@ -18,12 +18,10 @@ public class VoteService {
 
     private final VoteRepository voteRepository;
     private final MenuRepository menuRepository;
-    private final DateTimeBean dateTimeBean;
 
-    public VoteService(VoteRepository voteRepository, MenuRepository menuRepository, DateTimeBean dateTimeBean) {
+    public VoteService(VoteRepository voteRepository, MenuRepository menuRepository) {
         this.voteRepository = voteRepository;
         this.menuRepository = menuRepository;
-        this.dateTimeBean = dateTimeBean;
     }
 
     public Vote get(int id, int userId) {
@@ -36,7 +34,7 @@ public class VoteService {
 
     @Transactional
     public void update(int id, int userId, int restaurantId) {
-        LocalDateTime currentDateTime = dateTimeBean.getDATE_TIME_CURRENT();
+        LocalDateTime currentDateTime = getCurrentDateTime();
         checkTimeToUpdateVote(currentDateTime.toLocalTime());
 
         Vote vote = get(id, userId);
@@ -46,7 +44,7 @@ public class VoteService {
 
     @Transactional
     public Vote create(int userId, int restaurantId) {
-        LocalDateTime currentDateTime = dateTimeBean.getDATE_TIME_CURRENT();
+        LocalDateTime currentDateTime = getCurrentDateTime();
         Menu menu = menuRepository.getByDate(restaurantId, currentDateTime.toLocalDate());
         checkNotFound(menu, "Menu to date=" + currentDateTime.toLocalDate().toString());
         return voteRepository.save(new Vote(), userId, restaurantId, currentDateTime.toLocalDate());

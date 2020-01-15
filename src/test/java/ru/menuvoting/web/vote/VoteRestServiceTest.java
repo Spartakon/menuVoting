@@ -9,10 +9,11 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.menuvoting.RestaurantTestData;
 import ru.menuvoting.VoteTestData;
-import ru.menuvoting.datetime.DateTimeBean;
 import ru.menuvoting.model.Vote;
 import ru.menuvoting.service.VoteService;
 import ru.menuvoting.web.AbstractControllerTest;
+
+import java.time.LocalTime;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -33,9 +34,6 @@ class VoteRestServiceTest extends AbstractControllerTest {
 
     @Autowired
     private VoteService voteService;
-
-    @Autowired
-    private DateTimeBean dateTimeBean;
 
     @Test
     void get() throws Exception {
@@ -74,47 +72,78 @@ class VoteRestServiceTest extends AbstractControllerTest {
     @Test
     @Transactional(propagation = Propagation.NEVER)
     void update() throws Exception {
-        dateTimeBean.setIsTest(KEY_FOR_TEST_BEFORE);
-        Vote updated = VoteTestData.getUpdated();
-        mockMvc.perform(MockMvcRequestBuilders.put(REST_URL + VOTE1_ID)
-                .param("restaurantId", String.valueOf(RESTAURANT2_ID))
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(userHttpBasic(USER)))
-                .andExpect(status().isNoContent())
-                .andDo(print());
+        if (LocalTime.now().isBefore(TIME_FINISHING_UPDATE_VOTE)) {
+            Vote updated = VoteTestData.getUpdated();
+            mockMvc.perform(MockMvcRequestBuilders.put(REST_URL + VOTE1_ID)
+                    .param("restaurantId", String.valueOf(RESTAURANT2_ID))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .with(userHttpBasic(USER)))
+                    .andExpect(status().isNoContent())
+                    .andDo(print());
 
-        Vote actual = voteService.getWithRestaurant(VOTE1_ID, USER_ID);
-        VOTE_MATCHERS.assertMatch(actual, updated);
-        RestaurantTestData.RESTAURANT_MATCHERS.assertMatch(actual.getRestaurant(), RESTAURANT2);
+            Vote actual = voteService.getWithRestaurant(VOTE1_ID, USER_ID);
+            VOTE_MATCHERS.assertMatch(actual, updated);
+            RestaurantTestData.RESTAURANT_MATCHERS.assertMatch(actual.getRestaurant(), RESTAURANT2);
+        } else {
+            mockMvc.perform(MockMvcRequestBuilders.put(REST_URL + VOTE1_ID)
+                    .param("restaurantId", String.valueOf(RESTAURANT2_ID))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .with(userHttpBasic(USER)))
+                    .andExpect(status().isUnprocessableEntity())
+                    .andExpect(jsonPath("$.type").value(VALIDATION_ERROR.name()))
+                    .andExpect(jsonPath("$.details").value(
+                            "ru.menuvoting.util.exception.TimeVotingException:" +
+                                    " Don't change your vote after " + TIME_FINISHING_UPDATE_VOTE.toString()));
+        }
     }
 
     @Test
     @Transactional(propagation = Propagation.NEVER)
     void updateAfterFinishVotingError() throws Exception {
-        dateTimeBean.setIsTest(KEY_FOR_TEST_AFTER);
-        mockMvc.perform(MockMvcRequestBuilders.put(REST_URL + VOTE1_ID)
-                .param("restaurantId", String.valueOf(RESTAURANT2_ID))
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(userHttpBasic(USER)))
-                .andDo(print())
-                .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.type").value(VALIDATION_ERROR.name()))
-                .andExpect(jsonPath("$.details").value(
-                        "ru.menuvoting.util.exception.TimeVotingException:" +
-                                " Don't change your vote after " + TIME_FINISHING_UPDATE_VOTE.toString()));
+        if (LocalTime.now().isAfter(TIME_FINISHING_UPDATE_VOTE)) {
+            mockMvc.perform(MockMvcRequestBuilders.put(REST_URL + VOTE1_ID)
+                    .param("restaurantId", String.valueOf(RESTAURANT2_ID))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .with(userHttpBasic(USER)))
+                    .andDo(print())
+                    .andExpect(status().isUnprocessableEntity())
+                    .andExpect(jsonPath("$.type").value(VALIDATION_ERROR.name()))
+                    .andExpect(jsonPath("$.details").value(
+                            "ru.menuvoting.util.exception.TimeVotingException:" +
+                                    " Don't change your vote after " + TIME_FINISHING_UPDATE_VOTE.toString()));
+        } else {
+            mockMvc.perform(MockMvcRequestBuilders.put(REST_URL + VOTE1_ID)
+                    .param("restaurantId", String.valueOf(RESTAURANT2_ID))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .with(userHttpBasic(USER)))
+                    .andExpect(status().isNoContent());
+        }
     }
 
     @Test
     void updateMenuForLastDateError() throws Exception {
-        dateTimeBean.setIsTest(KEY_FOR_TEST_BEFORE);
-        mockMvc.perform(MockMvcRequestBuilders.put(REST_URL + VOTE4_ID)
-                .param("restaurantId", String.valueOf(RESTAURANT1_ID))
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(userHttpBasic(USER2)))
-                .andDo(print())
-                .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.type").value(VALIDATION_ERROR.name()))
-                .andExpect(jsonPath("$.details").value("ru.menuvoting.util.exception.TimeVotingException: Don't change a vote for a previous date"));
+        if (LocalTime.now().isBefore(TIME_FINISHING_UPDATE_VOTE)) {
+            mockMvc.perform(MockMvcRequestBuilders.put(REST_URL + VOTE4_ID)
+                    .param("restaurantId", String.valueOf(RESTAURANT1_ID))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .with(userHttpBasic(USER2)))
+                    .andDo(print())
+                    .andExpect(status().isUnprocessableEntity())
+                    .andExpect(jsonPath("$.type").value(VALIDATION_ERROR.name()))
+                    .andExpect(jsonPath("$.details").value(
+                            "ru.menuvoting.util.exception.TimeVotingException: Don't change a vote for a previous date")
+                    );
+        } else {
+            mockMvc.perform(MockMvcRequestBuilders.put(REST_URL + VOTE1_ID)
+                    .param("restaurantId", String.valueOf(RESTAURANT2_ID))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .with(userHttpBasic(USER)))
+                    .andExpect(status().isUnprocessableEntity())
+                    .andExpect(jsonPath("$.type").value(VALIDATION_ERROR.name()))
+                    .andExpect(jsonPath("$.details").value(
+                            "ru.menuvoting.util.exception.TimeVotingException:" +
+                                    " Don't change your vote after " + TIME_FINISHING_UPDATE_VOTE.toString()));
+        }
     }
 
     @Test
